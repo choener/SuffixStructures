@@ -19,6 +19,11 @@ description:
 
 Extra-Source-Files:
 
+flag criterion
+  description: build criterion benchmark
+  default: False
+  manual:  True
+
 library
   build-depends:
     bytestring        == 0.10.*   ,
@@ -32,6 +37,10 @@ library
     -O2 -funbox-strict-fields
 
 executable SAperformance
+  if flag(criterion)
+    buildable: True
+  else
+    buildable: False
   build-depends:
     bytestring        == 0.10.*   ,
     cmdargs           == 0.10.*   ,
@@ -42,7 +51,7 @@ executable SAperformance
     SuffixStructures              ,
     vector            == 0.10.*   ,
     vector-algorithms == 0.6.*    ,
-    base        == 4.*
+    base              == 4.*
   main-is:
     src/SAperformance.hs
   ghc-options:
