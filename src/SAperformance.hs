@@ -24,14 +24,14 @@ data Options = Options
   }
   deriving (Show,Data,Typeable)
 
-options = Options
-  { from  =  1
-  , step  =  2
-  , count = 20
+options = cmdArgsMode $ Options
+  { from  =  1 &= help ""
+  , step  = 10 &= help ""
+  , count = 10 &= help ""
   }
 
 main = do
-  Options{..} <- cmdArgs options
+  o@Options{..} <- cmdArgsRun options
   rs :: [Vector Int] <- sequence . map (\k -> withSystemRandom . asGenST $ \gen -> uniformVector gen k) . take count $ (iterate (*step) from)
   deepseq rs $ defaultMain
     [ bgroup "naive"
