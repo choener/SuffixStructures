@@ -27,15 +27,19 @@ data Options = Options
 options = cmdArgsMode $ Options
   { from  =  1 &= help ""
   , step  = 10 &= help ""
-  , count = 10 &= help ""
+  , count =  5 &= help ""
   }
 
 main = do
   o@Options{..} <- cmdArgsRun options
   rs :: [Vector Int] <- sequence . map (\k -> withSystemRandom . asGenST $ \gen -> uniformVector gen k) . take count $ (iterate (*step) from)
   deepseq rs $ defaultMain
-    [ bgroup "naive"
-        $ zipWith (\k r -> bench (show k) $ whnf (VU.length . sa . genSAvu) r)
+    [ bgroup "naive/genSA"
+        $ zipWith (\k r -> bench (show k) $ whnf (VU.length . sa . genSA) r)
+                  (iterate (*step) from)
+                  rs
+    , bgroup "naive/genSAaa"
+        $ zipWith (\k r -> bench (show k) $ whnf (VU.length . sa . genSA) r)
                   (iterate (*step) from)
                   rs
     ]
