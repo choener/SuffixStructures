@@ -58,7 +58,7 @@ executable SAperformance
   main-is:
     src/SAperformance.hs
   ghc-options:
-    -O2 -fllvm -optlo-O3 -optlo-std-compile-opts
+    -O2 -funbox-strict-fields -fllvm -optlo-O3 -optlo-std-compile-opts
 
 
 
