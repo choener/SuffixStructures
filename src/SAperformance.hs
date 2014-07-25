@@ -16,6 +16,7 @@ import           System.Console.CmdArgs
 import           System.Environment (withArgs)
 import           System.Random.MWC (withSystemRandom, asGenST, uniformVector)
 
+import Data.SuffixStructure.ESA
 import Data.SuffixStructure.NaiveArray
 
 
