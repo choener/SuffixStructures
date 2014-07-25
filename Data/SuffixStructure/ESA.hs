@@ -1,9 +1,14 @@
 
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE PatternGuards #-}
+
 module Data.SuffixStructure.ESA where
 
-import Data.Vector.Unboxed (Vector)
-import Data.Int (Int8)
-import Data.IntMap.Strict (IntMap)
+import           Data.Int (Int8)
+import           Data.IntMap.Strict (IntMap)
+import           Data.Vector.Unboxed (Vector)
+import qualified Data.IntMap.Strict as IM
+import qualified Data.Vector.Unboxed as VU
 
 
 
@@ -21,3 +26,12 @@ data SA = SA
   }
   deriving (Eq,Ord,Show)
 
+-- | Automatically check 'lcp' and 'lcpLong' to return the real prefix
+-- length in 'Int' (as opposed to 'Int8' storage of 'lcp').
+
+lcpAt :: SA -> Int -> Int
+lcpAt SA{..} k
+  | p >= 0 = fromIntegral p
+  | Just p' <- IM.lookup k lcpLong = p' -- by construction!
+  where p = VU.unsafeIndex lcp k
+{-# INLINE lcpAt #-}
