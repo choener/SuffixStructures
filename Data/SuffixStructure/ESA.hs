@@ -3,12 +3,12 @@
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE RecordWildCards #-}
 
--- | The suffix array data structure.
+-- | The suffix array data structure. Supports (de-) serialization via
+-- aeson,cereal,binary.
 --
 -- Reading and writing to and from specialized "bio" formats is currently
 -- open.
 --
--- TODO serialization to json
 -- TODO compression during serialization?
 -- TODO versioning?
 -- TODO read sam/bam format?
@@ -16,7 +16,9 @@
 
 module Data.SuffixStructure.ESA where
 
+import           Data.Aeson
 import           Data.Binary
+import           Data.Default.Class
 import           Data.Int (Int8)
 import           Data.IntMap.Strict (IntMap)
 import           Data.Serialize
@@ -42,7 +44,12 @@ data SA = SA
   deriving (Eq,Ord,Show,Generic)
 
 instance Binary    SA
+instance FromJSON  SA
 instance Serialize SA
+instance ToJSON    SA
+
+instance Default SA where
+  def = SA VU.empty VU.empty IM.empty
 
 -- | Automatically check 'lcp' and 'lcpLong' to return the real prefix
 -- length in 'Int' (as opposed to 'Int8' storage of 'lcp').
