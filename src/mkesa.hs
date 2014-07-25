@@ -1,7 +1,87 @@
 
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE TupleSections #-}
+
+-- | Create ESA data structures from multiple sources and serialize to
+-- disk.
+
 module Main where
 
+import           Control.Applicative ((<$>))
+import           System.Console.CmdArgs
+import qualified Data.Binary as DB
+import qualified Data.Serialize as DS
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.Vector.Unboxed as VU
+import           Text.Printf
+import qualified Data.IntMap.Strict as IM
 
+import           Data.SuffixStructure.ESA
+import           Data.SuffixStructure.NaiveArray
+
+
+
+data Type = Binary | Cereal
+  deriving (Show,Data,Typeable)
+
+data Options
+  = RawBS
+    { infile  :: String
+    , outfile :: String
+    , outtype :: Type
+    }
+  | ReadTest
+    { infile  :: String
+    , outfile :: String
+    , intype  :: Type
+    }
+  deriving (Show,Data,Typeable)
+
+-- | Read a file as a simple raw bytestring and create the enhanced suffix
+-- array.
+
+oRawBS = RawBS
+  { infile  = def &= help ""
+  , outfile = def &= help ""
+  , outtype = Cereal &= help ""
+  }
+
+-- | Will read in the enhanced suffix array, print some statistics, and
+-- quit.
+--
+-- TODO should actually become @Statistics@ I think.
+
+oReadTest = ReadTest
+  { intype = Cereal &= help ""
+  }
 
 main = do
-  return ()
+  o <- cmdArgs $ modes [oRawBS, oReadTest]
+  case o of
+    RawBS{..} -> do i <- if null infile then BL.getContents else BL.readFile infile
+                    let !ar = genSA i
+                    let writer = if null outfile then BL.putStr else BL.writeFile outfile
+                    writer $ case outtype of
+                        Binary -> DB.encode ar
+                        Cereal -> DS.encodeLazy ar
+    ReadTest{..} -> do  i <- if null infile then BL.getContents else BL.readFile infile
+                        let ar :: SA = case intype of
+                              Binary -> DB.decode i
+                              Cereal -> case DS.decodeLazy i of
+                                          Right d   -> d
+                                          Left  err -> error err
+                        printf "Suffix array size: %d\n" . VU.length $ sa ar
+                        let lcpdist = IM.fromListWith (+) $
+                                        (VU.toList . VU.map (,1::Int) . VU.map fromIntegral $ lcp ar) ++
+                                        (map (,1) . IM.elems $ lcpLong ar)
+                        printf "LCP array distribution\n"
+                        let tmax = maximum $ IM.keys lcpdist
+                        mapM_ (printf "%8d") $ [0 .. tmax]
+                        printf "\n"
+                        mapM_ (printf "%8d") $ map (maybe 0 id . flip IM.lookup lcpdist) $ [0 .. tmax]
+                        printf "\n"
+                        return ()
+
