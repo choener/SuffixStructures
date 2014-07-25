@@ -11,13 +11,16 @@
 module Main where
 
 import           Control.Applicative ((<$>))
-import           System.Console.CmdArgs
+import           Control.Monad (forM_)
+import           Data.Function (on)
+import           Data.List (groupBy)
 import qualified Data.Binary as DB
-import qualified Data.Serialize as DS
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Vector.Unboxed as VU
-import           Text.Printf
 import qualified Data.IntMap.Strict as IM
+import qualified Data.Serialize as DS
+import qualified Data.Vector.Unboxed as VU
+import           System.Console.CmdArgs
+import           Text.Printf
 
 import           Data.SuffixStructure.ESA
 import           Data.SuffixStructure.NaiveArray
@@ -79,9 +82,10 @@ main = do
                                         (map (,1) . IM.elems $ lcpLong ar)
                         printf "LCP array distribution\n"
                         let tmax = maximum $ IM.keys lcpdist
-                        mapM_ (printf "%8d") $ [0 .. tmax]
-                        printf "\n"
-                        mapM_ (printf "%8d") $ map (maybe 0 id . flip IM.lookup lcpdist) $ [0 .. tmax]
-                        printf "\n"
-                        return ()
+                        let ts = groupBy ((==) `on` (`div` 10)) [0 .. tmax]
+                        forM_ ts $ \tt -> do
+                          mapM_ (printf "%8d") $ tt
+                          printf "\n"
+                          mapM_ (printf "%8d") $ map (maybe 0 id . flip IM.lookup lcpdist) $ tt
+                          printf "\n\n"
 
