@@ -13,7 +13,8 @@ module Main where
 import           Control.Applicative ((<$>))
 import           Control.Monad (forM_)
 import           Data.Function (on)
-import           Data.List (groupBy)
+import           Data.List (groupBy,sort)
+import           Data.Tuple (swap)
 import qualified Data.Binary as DB
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.IntMap.Strict as IM
@@ -78,9 +79,10 @@ main = do
                                           Left  err -> error err
                         printf "Suffix array size: %d\n" . VU.length $ sa ar
                         let lcpdist = IM.fromListWith (+) $
-                                        (VU.toList . VU.map (,1::Int) . VU.map fromIntegral $ lcp ar) ++
+                                        (VU.toList . VU.map (,1::Int) . VU.filter (>=0) . VU.map fromIntegral $ lcp ar) ++
                                         (map (,1) . IM.elems $ lcpLong ar)
                         printf "LCP array distribution\n"
+                        {-
                         let tmax = maximum $ IM.keys lcpdist
                         let ts = groupBy ((==) `on` (`div` 10)) [0 .. tmax]
                         forM_ ts $ \tt -> do
@@ -88,4 +90,10 @@ main = do
                           printf "\n"
                           mapM_ (printf "%8d") $ map (maybe 0 id . flip IM.lookup lcpdist) $ tt
                           printf "\n\n"
+                        -}
+                        let hs = take 14 . reverse . sort . map swap $ IM.assocs lcpdist
+                        mapM_ (printf "%8d") $ map snd hs
+                        printf "\n"
+                        mapM_ (printf "%8d") $ map fst hs
+                        printf "\n\n"
 
