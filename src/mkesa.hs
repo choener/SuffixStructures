@@ -47,7 +47,9 @@ data Options
   deriving (Show,Data,Typeable)
 
 -- | Read a file as a simple raw bytestring and create the enhanced suffix
--- array.
+-- array. Note: the input is a strict bytestring. We need to load the
+-- complete bytestring anyway, so we make it strict. We don't mmap because
+-- the whole string is loaded.
 
 oRawBS = RawBS
   { infile  = def &= help ""
@@ -67,7 +69,7 @@ oReadTest = ReadTest
 main = do
   o <- cmdArgs $ modes [oRawBS, oReadTest]
   case o of
-    RawBS{..} -> do i <- if null infile then BL.getContents else BL.readFile infile
+    RawBS{..} -> do i <- if null infile then B.getContents else B.readFile infile
                     let !ar = genSA i
                     let writer = if null outfile then BL.putStr else BL.writeFile outfile
                     writer $ case outtype of

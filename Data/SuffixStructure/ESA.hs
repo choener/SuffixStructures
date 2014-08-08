@@ -35,6 +35,8 @@ import qualified Data.Vector.Unboxed as VU
 -- table.
 --
 -- TODO maybe parametrize on the Int type (Int,Int64,Int32,Word's)
+-- TODO skip table?
+-- TODO inverse suffix array?
 
 data SA = SA
   { sa      :: !(Vector Int)    -- ^ the actual suffix array using 8byte Ints
