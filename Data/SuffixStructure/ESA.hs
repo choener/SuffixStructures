@@ -30,9 +30,12 @@ import qualified Data.Vector.Unboxed as VU
 -- | The Suffix Array data type, together with the longest common prefix
 -- table.
 --
--- TODO maybe parametrize on the Int type (Int,Int64,Int32,Word's)
 -- TODO skip table?
 -- TODO inverse suffix array?
+--
+-- TODO maybe parametrize on the Int type (Int,Int64,Int32,Word's) This
+-- will require better specialization of operations in @NaiveArray@ and
+-- elsewhere. Otherwise performance drops quite noticable by @x5@ to @x10@.
 
 data SA = SA
   { sa      :: !(Vector Int)    -- ^ the actual suffix array using 8byte Ints

@@ -48,6 +48,7 @@ library
     Haskell2010
   default-extensions: BangPatterns
                     , DeriveGeneric
+                    , FlexibleContexts
                     , PatternGuards
                     , RankNTypes
                     , RecordWildCards
@@ -87,6 +88,7 @@ executable BenchmarkSuffixStructures
   else
     buildable: False
   build-depends: base
+               , bytestring
                , cmdargs            == 0.10.*
                , criterion          == 1.1.*
                , deepseq
