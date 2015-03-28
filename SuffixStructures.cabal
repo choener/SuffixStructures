@@ -32,14 +32,14 @@ flag llvm
   manual:  True
 
 library
-  build-depends: base                    >= 4.7     && < 4.9
+  build-depends: base                    >= 4.7       && < 4.9
                , aeson                   == 0.8.*
                , binary                  == 0.7.*
                , bytestring              == 0.10.*
                , cereal                  == 0.4.*
                , containers              == 0.5.*
                , data-default-class      == 0.0.1
-               , ListLike                == 4.1.*
+               , ListLike                >= 4.1.0.0   && < 4.3
                , primitive               == 0.5.*
                , vector                  == 0.10.*
                , vector-algorithms       == 0.6.*
