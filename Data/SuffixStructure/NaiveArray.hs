@@ -1,8 +1,4 @@
 
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeFamilies #-}
-
 -- |
 --
 -- TODO need to check performance of 'drop' vs 'unsafeDrop'

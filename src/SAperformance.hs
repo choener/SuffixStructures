@@ -9,7 +9,7 @@ module Main where
 
 import           Control.DeepSeq
 import           Criterion.Main
-import           Data.Char (ord)
+import           Data.Char (ord,chr)
 import           Data.Vector.Unboxed (Vector(..))
 import qualified Data.Vector.Unboxed as VU
 import           System.Console.CmdArgs
@@ -38,15 +38,18 @@ options = Options
 
 main = do
   o@Options{..} <- cmdArgs options
-  rs :: [Vector Int] <- sequence . map (\k -> withSystemRandom . asGenST $ \gen -> uniformVector gen k) . take count $ (iterate (*step) from)
-  withArgs remaining . deepseq rs $ defaultMain
-    [ bgroup "naive/genSAdef"
+  is :: [Vector Int] <- sequence . map (\k -> withSystemRandom . asGenST $ \gen -> uniformVector gen k) . take count $ (iterate (*step) from)
+  let cs :: [Vector Char] = map (VU.map (chr . flip mod 256)) is
+  withArgs remaining . deepseq (is,cs) $ defaultMain
+    [ bgroup "naive/introsort"
         $ zipWith (\k r -> bench (show k) $ whnf (VU.length . sa . genSA) r)
                   (iterate (*step) from)
-                  rs
-    , bgroup "naive/genSAaa"
-        $ zipWith (\k r -> bench (show k) $ whnf (VU.length . sa . genSA) r)
+                  cs
+    {-
+    , bgroup "naive/americanflag"
+        $ zipWith (\k r -> bench (show k) $ whnf (VU.length . sa . genSAaf) r)
                   (iterate (*step) from)
-                  rs
+                  cs
+    -}
     ]
 

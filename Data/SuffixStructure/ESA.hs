@@ -1,8 +1,4 @@
 
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE RecordWildCards #-}
-
 -- | The suffix array data structure. Supports (de-) serialization via
 -- aeson,cereal,binary.
 --

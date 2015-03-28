@@ -1,43 +1,58 @@
 name:           SuffixStructures
-version:        0.0.0.1
-author:         Christian Hoener zu Siederdissen, 2014
-copyright:      Christian Hoener zu Siederdissen, 2014
-homepage:       http://www.tbi.univie.ac.at/~choener/
-maintainer:     choener@tbi.univie.ac.at
+version:        0.0.1.0
+author:         Christian Hoener zu Siederdissen
+copyright:      Christian Hoener zu Siederdissen, 2014 - 2015
+homepage:       http://www.bioinf.uni-leipzig.de/~choener/
+maintainer:     choener@bioinf.uni-leipzig.de
 category:       Data, Data Structures
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 stability:      experimental
-cabal-version:  >= 1.8
+cabal-version:  >= 1.10
 synopsis:
                 Suffix array construction
 description:
-                Suffix array construction in Haskell
+                Suffix array construction in Haskell. Currently, only a naive
+                method is provided. More advanced construction methods might
+                follow.
 
 
 
 Extra-Source-Files:
 
-flag criterion
+flag benchmark
   description: build criterion benchmark
   default: False
   manual:  True
 
+flag llvm
+  description: use llvm backend
+  default: False
+  manual:  True
+
 library
-  build-depends:
-    aeson                   == 0.8.*    ,
-    binary                  == 0.7.*    ,
-    bytestring              == 0.10.*   ,
-    cereal                  == 0.4.*    ,
-    containers              == 0.5.*    ,
-    data-default-class      == 0.0.1    ,
-    ListLike                == 4.1.*    ,
-    primitive               == 0.5.*    ,
-    vector                  == 0.10.*   ,
-    vector-algorithms       == 0.6.*    ,
-    vector-binary-instances == 0.2.*    ,
-    base                    == 4.*
+  build-depends: base                    >= 4.7     && < 4.9
+               , aeson                   == 0.8.*
+               , binary                  == 0.7.*
+               , bytestring              == 0.10.*
+               , cereal                  == 0.4.*
+               , containers              == 0.5.*
+               , data-default-class      == 0.0.1
+               , ListLike                == 4.1.*
+               , primitive               == 0.5.*
+               , vector                  == 0.10.*
+               , vector-algorithms       == 0.6.*
+               , vector-binary-instances == 0.2.*
+  default-language:
+    Haskell2010
+  default-extensions: BangPatterns
+                    , DeriveGeneric
+                    , PatternGuards
+                    , RankNTypes
+                    , RecordWildCards
+                    , TypeFamilies
+
   exposed-modules:
     Data.SuffixStructure.ESA
     Data.SuffixStructure.NaiveArray
@@ -45,56 +60,54 @@ library
     -O2 -funbox-strict-fields
 
 executable mkesa
-  build-depends:
-    aeson                   == 0.8.*    ,
-    binary                  == 0.7.*    ,
-    bytestring              == 0.10.*   ,
-    cereal                  == 0.4.*    ,
-    cmdargs                 == 0.10.*   ,
-    containers              == 0.5.*    ,
-    data-default-class      == 0.0.1    ,
-    deepseq                 == 1.3.*    ,
-    ListLike                == 4.1.*    ,
-    primitive               == 0.5.*    ,
-    vector                  == 0.10.*   ,
-    vector-algorithms       == 0.6.*    ,
-    vector-binary-instances == 0.2.*    ,
-    base                    == 4.*
+  build-depends: base
+               , cmdargs            == 0.10.*
+               , SuffixStructures
+               , aeson
+               , binary
+               , containers
+               , bytestring
+               , cereal
+               , vector
+  default-language:
+    Haskell2010
+  hs-source-dirs:
+    src
   main-is:
-    src/mkesa.hs
+    mkesa.hs
   ghc-options:
-    -O2 -funbox-strict-fields -fllvm -optlo-O3 -optlo-std-compile-opts
+    -O2 -funbox-strict-fields
+  if flag(llvm)
+    ghc-options:
+      -fllvm -optlo-O3 -optlo-std-compile-opts
 
-executable SAperformance
-  if flag(criterion)
+executable BenchmarkSuffixStructures
+  if flag(benchmark)
     buildable: True
   else
     buildable: False
-  build-depends:
-    aeson                   == 0.8.*    ,
-    binary                  == 0.7.*    ,
-    bytestring              == 0.10.*   ,
-    cereal                  == 0.4.*    ,
-    cmdargs                 == 0.10.*   ,
-    containers              == 0.5.*    ,
-    criterion               == 0.8.*    ,
-    data-default-class      == 0.0.1    ,
-    deepseq                 == 1.3.*    ,
-    ListLike                == 4.1.*    ,
-    mwc-random              == 0.13.*   ,
-    primitive               == 0.5.*    ,
-    vector                  == 0.10.*   ,
-    vector-algorithms       == 0.6.*    ,
-    vector-binary-instances == 0.2.*    ,
-    base                    == 4.*
+  build-depends: base
+               , cmdargs            == 0.10.*
+               , criterion          == 1.1.*
+               , deepseq
+               , mwc-random         == 0.13.*
+               , SuffixStructures
+               , vector
+  default-language:
+    Haskell2010
+  hs-source-dirs:
+    src
   main-is:
-    src/SAperformance.hs
+    SAperformance.hs
   ghc-options:
-    -O2 -funbox-strict-fields -fllvm -optlo-O3 -optlo-std-compile-opts
+    -O2 -funbox-strict-fields
+  if flag(llvm)
+    ghc-options:
+      -fllvm -optlo-O3 -optlo-std-compile-opts
 
 
 
 source-repository head
   type: git
-  location: git://github.com/choener/OrderedBits
+  location: git://github.com/choener/SuffixStructures
 
