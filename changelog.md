@@ -4,3 +4,5 @@
 - naive suffix arrays
 - Criterion performance measurements
 - QuickCheck
+- travis-ci integration
+

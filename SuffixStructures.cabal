@@ -10,8 +10,8 @@ license-file:   LICENSE
 build-type:     Simple
 stability:      experimental
 cabal-version:  >= 1.10
-synopsis:
-                Suffix array construction
+tested-with:    GHC == 7.8.4, GHC == 7.10.1
+synopsis:       Suffix array construction
 description:
                 Suffix array construction in Haskell. Currently, only a naive
                 method is provided. More advanced construction methods might
@@ -20,16 +20,17 @@ description:
 
 
 Extra-Source-Files:
+  README.md
+  changelog.md
 
-flag benchmark
-  description: build criterion benchmark
-  default: False
-  manual:  True
+
 
 flag llvm
   description: use llvm backend
   default: False
   manual:  True
+
+
 
 library
   build-depends: base                    >= 4.7       && < 4.9
@@ -60,6 +61,8 @@ library
   ghc-options:
     -O2 -funbox-strict-fields
 
+
+
 executable mkesa
   build-depends: base
                , cmdargs            == 0.10.*
@@ -82,11 +85,9 @@ executable mkesa
     ghc-options:
       -fllvm -optlo-O3 -optlo-std-compile-opts
 
-executable BenchmarkSuffixStructures
-  if flag(benchmark)
-    buildable: True
-  else
-    buildable: False
+
+
+benchmark BenchmarkSuffixStructures
   build-depends: base
                , bytestring
                , cmdargs            == 0.10.*
@@ -101,6 +102,8 @@ executable BenchmarkSuffixStructures
     src
   main-is:
     SAperformance.hs
+  type:
+    exitcode-stdio-1.0
   ghc-options:
     -O2 -funbox-strict-fields
   if flag(llvm)
